@@ -1,65 +1,69 @@
-🧪 ENUNCIADO TIPO EXAMEN - Deno Fresh + Harry Potter API
-1. Autenticación y Middleware
-Página principal (/)
-Redirige a /login.
+## 🧪 Enunciado Tipo Examen — Proyecto Deno Fresh + API de Harry Potter
 
-La página de login (/login) muestra un formulario con username y password.
+Este proyecto consiste en una SPA desarrollada con **Deno Fresh** que consume la API pública de **Harry Potter**:  
+📎 https://hp-api.onrender.com/
 
-Si la contraseña es "expecto123":
+### 1. Autenticación y Middleware
 
-Se guarda una cookie username=<nombre> válida 7 días.
+- La **página principal** (`/`) redirige automáticamente a `/login`.
+- En `/login` se muestra un formulario con `username` y `password`.
+- Si la contraseña introducida es `"expecto123"`:
+  - Se guarda una **cookie**: `username=<nombre>` válida durante 7 días.
+  - Se redirige al usuario autenticado a la ruta `/houses`.
 
-Se redirige al usuario a la ruta /houses.
+#### Middleware (`routes/(platform)/_middleware.ts`)
+- Detecta si existe la cookie `username`.
+- Si no existe, redirige a `/login`.
+- Si existe, la guarda en `ctx.state.username` y permite continuar.
 
-Middleware (routes/(platform)/_middleware.ts)
-Detecta la cookie username.
+---
 
-Si no existe, redirige a /login.
+### 2. Listado de Casas y Personajes
 
-Si existe, la guarda en ctx.state.username y permite continuar.
+#### Ruta protegida `/houses`
+- Muestra **botones** para cada casa mágica:
+  - Gryffindor
+  - Slytherin
+  - Hufflepuff
+  - Ravenclaw
+- Al hacer clic en un botón, redirige a:  
+  `/house/<nombreCasa>` (por ejemplo: `/house/Gryffindor`)
 
-2. Listado de Casas y Personajes
-Ruta protegida /houses
-Muestra botones para cada casa mágica: Gryffindor, Slytherin, Hufflepuff, Ravenclaw.
+#### Ruta `/house/[house]`
+- Carga los personajes de esa casa desde la API:  
+  `https://hp-api.onrender.com/api/characters/house/<house>`
+- Junto a cada personaje aparece un botón:
+  - ⭐️ **Añadir a favoritos**
+  - ❌ **Quitar de favoritos**
+- Los favoritos se guardan en la cookie:  
+  `favorites=<id1,id2,...>` (válida 7 días)
 
-Al hacer click en un botón, redirige a /house/<nombreCasa> (ej. /house/gryffindor).
+---
 
-Ruta /house/[house]
-Muestra los personajes de esa casa usando la API:
-https://hp-api.onrender.com/api/characters/house/<house>
+### 3. Búsqueda de Personajes
 
-Junto a cada personaje, debe haber un botón para:
+#### Ruta `/search`
+- Muestra un **formulario de búsqueda** por nombre (`input name="name"`).
+- Utiliza la API completa de personajes:  
+  `https://hp-api.onrender.com/api/characters`
+- Filtra y muestra solo los personajes cuyo nombre **contiene** el texto buscado (sin importar mayúsculas o minúsculas).
 
-⭐️ Añadir a favoritos.
+---
 
-❌ Quitar de favoritos.
+### 4. Página de Favoritos
 
-Los favoritos se guardan en una cookie favorites=<id1,id2,...> (máximo 7 días).
+#### Ruta protegida `/favorites`
+- Muestra solo los personajes que aparecen en la cookie `favorites`.
+- Si no hay favoritos:
+  - Redirige a `/houses`
+  - Borra la cookie `favorites`
 
-3. Búsqueda de Personajes
-Ruta /search
-Mostrar un formulario de búsqueda por nombre (input name="name").
+---
 
-Usar la API general:
-https://hp-api.onrender.com/api/characters
+### 5. Perfil del Usuario
 
-Filtrar los personajes cuyo nombre incluya el texto buscado (sin distinguir mayúsculas/minúsculas).
-
-Mostrar solo los resultados coincidentes.
-
-4. Página de Favoritos
-Ruta protegida /favorites
-Muestra los personajes que están en la cookie favorites.
-
-Si no hay favoritos, redirige a /houses y borra la cookie favorites.
-
-5. Perfil del Usuario
-Ruta protegida /profile
-Muestra el username de la cookie.
-
-Botón "Cerrar sesión" que:
-
-Elimina las cookies username y favorites.
-
-Redirige a /login.
-
+#### Ruta protegida `/profile`
+- Muestra el `username` guardado en la cookie.
+- Incluye un botón `"Cerrar sesión"` que:
+  - Elimina las cookies `username` y `favorites`
+  - Redirige al usuario a `/login`
